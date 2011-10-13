@@ -423,4 +423,11 @@ extern NSString* cacheURLKey;
 							   options:NSCaseInsensitiveSearch|NSAnchoredSearch].length > 0);
 }
 
+- (BOOL)isText {
+    NSString* contentType = [self contentType];
+	return (contentType &&
+			[contentType rangeOfString:@"text/plain"
+							   options:NSCaseInsensitiveSearch|NSAnchoredSearch].length > 0);
+}
+
 @end

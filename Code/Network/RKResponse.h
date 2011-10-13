@@ -255,4 +255,9 @@
  */
 - (BOOL)isJSON;
 
+/**
+ YES when the server returned a plain text response (MIME Type is text/plain)
+ */
+- (BOOL)isText;
+
 @end

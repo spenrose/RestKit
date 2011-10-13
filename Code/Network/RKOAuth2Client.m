@@ -20,6 +20,9 @@
 
 #import "RKOAuth2Client.h"
 #import "../Support/Errors.h"
+#import "../Support/NSURL+RestKit.h"
+#import "../Support/NSDictionary+RKAdditions.h"
+#import "../Support/RKLog.h"
 
 @implementation RKOAuth2Client
 
@@ -65,28 +68,32 @@
 - (NSURLRequest *)userAuthorizationRequestWithParameters:(NSDictionary *)additionalParameters {
     NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
     [parameters setValue:self.clientID forKey:@"client_id"];
-    [parameters setValue:@"web_server" forKey:@"type"];
+    [parameters setValue:@"code" forKey:@"response_type"];
+    // TODO: Should we let you set the response_type?
+    // TODO: response_type == code
     [parameters setValue:[self.redirectURL absoluteString] forKey:@"redirect_uri"];
+    // @"token", @"response_type",
     if (additionalParameters) {
         [parameters addEntriesFromDictionary:additionalParameters];
     }
     
     // TODO: should have a URLByAppendingQueryParameters: and [NSURL|RKURL URLWithString: queryParameters:];
-    NSURL *fullURL = [NSURL URLWithString:[[self.authorizeURL absoluteString] stringByAppendingFormat:@"?%@", [parameters URLEncodedString]]];
-    NSMutableURLRequest *authRequest = [NSMutableURLRequest requestWithURL:fullURL];
+    NSURL *URL = [NSURL URLWithString:[[self.authorizeURL absoluteString] stringByAppendingFormat:@"?%@", [parameters stringWithURLEncodedComponents]]];
+    NSMutableURLRequest *authRequest = [NSMutableURLRequest requestWithURL:URL];
     [authRequest setHTTPMethod:@"GET"];
     
     return [[authRequest copy] autorelease];
 }
 
-- (void)validateAuthorizationCode {
+- (void)validateAuthorizationWithAccessCode:(NSString *)accessCode {
     NSDictionary *parameters = [NSDictionary dictionaryWithObjectsAndKeys:
-                                _clientID, @"client_id", 
-                                _clientSecret, @"client_secret", 
-                                _authorizationCode, @"code", 
-                                _redirectURL, @"redirect_uri", 
+                                self.clientID, @"client_id", 
+                                self.clientSecret, @"client_secret",                                 
+                                self.redirectURL, @"redirect_uri", 
+                                accessCode, @"code",                                 
                                 @"authorization_code", @"grant_type", nil];
-    RKRequest *request = [RKRequest requestWithURL:_authorizationURL delegate:self];
+    RKRequest *request = [[RKRequest alloc] initWithURL:self.tokenURL];
+    request.delegate = self;
     request.params = parameters;
     request.method = RKRequestMethodPOST;
     [request send];
@@ -96,20 +103,28 @@
     NSError *error = nil;
     NSString *errorResponse = nil;
     
-    //Use the parsedBody answer in NSDictionary
-    
-    NSDictionary* oauthResponse = (NSDictionary *) [response parsedBody:&error];    
-    if (!oauthResponse && error) {
-        // TODO: Handle error case...
+    // If the response is plain text, 
+    NSDictionary *authorizationData = nil;
+    if ([response isText]) {
+        authorizationData = [NSDictionary dictionaryWithURLEncodedString:[response bodyAsString]];
+    } else {
+        authorizationData = (NSDictionary *) [response parsedBody:&error];
+    }
+         
+   if (!authorizationData && error) {
+        RKLogWarning(@"Unable to parse OAuth2 authorization response: %@", response);
+        return;
     }
     
-    if ([oauthResponse isKindOfClass:[NSDictionary class]]) {
+    if ([authorizationData isKindOfClass:[NSDictionary class]]) {
         
         //Check the if an access token comes in the response
-        _accessToken = [[oauthResponse objectForKey:@"access_token"] copy];
-        errorResponse = [oauthResponse objectForKey:@"error"];
+        // TODO: Turn the accessToken into an object...
+        // TODO: Should be able to get the refresh token here also...
+        _accessToken = [[authorizationData objectForKey:@"access_token"] copy];
+        errorResponse = [authorizationData objectForKey:@"error"];
         
-        if (_accessToken) {           
+        if (_accessToken) {
             // W00T We got an accessToken            
             [self.delegate OAuthClient:self didAcquireAccessToken:_accessToken];
             
@@ -119,7 +134,7 @@
             // The possible errors are defined in the OAuth2 Protocol
             
             RKOAuth2ClientErrorCode errorCode;
-            NSString *errorDescription = [oauthResponse objectForKey:@"error_description"];
+            NSString *errorDescription = [authorizationData objectForKey:@"error_description"];
             
             if ([errorResponse isEqualToString:@"invalid_grant"]) {
                 errorCode = RKOAuth2ClientErrorInvalidGrant;
@@ -187,6 +202,8 @@
     } else {
         // TODO: Logging...
     }
+    
+    [request release];
 }
 
 
@@ -201,6 +218,8 @@
     if ([self.delegate respondsToSelector:@selector(OAuthClient:didFailWithError:)]) {
         [self.delegate OAuthClient:self didFailWithError:clientError];
     }
+    
+    [request release];
 }
 
 @end
@@ -233,7 +252,7 @@
  * custom URL schemes will typically cause a failure so we should handle those here
  */
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
-    NSString *failingURLString = [error.userInfo objectForKey:NSErrorFailingURLStringKey];
+    NSString *failingURLString = [error.userInfo objectForKey:NSURLErrorFailingURLStringErrorKey];
     
     if ([failingURLString hasPrefix:[self.redirectURL absoluteString]]) {
         [webView stopLoading];
@@ -244,10 +263,11 @@
 - (void)extractAccessCodeFromCallbackURL:(NSURL *)callbackURL {
     NSString *accessCode = [[callbackURL queryDictionary] valueForKey:@"code"];
     
+    // TODO: Add to delegate?
     if ([self.delegate respondsToSelector:@selector(oauthClientDidReceiveAccessCode:)]) {
         [self.delegate oauthClientDidReceiveAccessCode:self];
     }
-    [self verifyAuthorizationWithAccessCode:accessCode];
+    [self validateAuthorizationWithAccessCode:accessCode];
 }
 
 @end

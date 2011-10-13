@@ -323,6 +323,7 @@
     if (self.queue) {
         [self.queue addRequest:self];
     } else {
+        RKLogWarning(@"[RKRequest send] invoked without a request queue. Request was not retained before being sent.");
         [self sendAsynchronously];
     }
 }

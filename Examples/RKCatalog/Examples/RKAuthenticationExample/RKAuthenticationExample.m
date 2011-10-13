@@ -7,6 +7,7 @@
 //
 
 #import "RKAuthenticationExample.h"
+#import <RestKit/Support/RKAlert.h>
 
 enum {
     RKAuthenticationExampleAuthNone = 0,
@@ -30,6 +31,16 @@ enum {
 - (void)loadView {
     [super loadView];
     
+    // Raise the logging during authentication
+    RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
+    RKLogConfigureByName("RestKit/Network/Queue", RKLogLevelTrace);
+    
+    self.title = @"Login to Facebook";
+    self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"Dismiss" 
+                                                                               style:UIBarButtonItemStyleDone 
+                                                                              target:self 
+                                                                              action:@selector(cancel)] autorelease];
+    
     webView = [[UIWebView alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:webView];
     [webView release];
@@ -47,10 +58,14 @@ enum {
     [OAuthClient authorizeUsingWebView:webView additionalParameters:params];
 }
 
+- (void)cancel {
+    [self.navigationController dismissModalViewControllerAnimated:YES];
+}
+
 #pragma mark - RKOAuth2Client
 
 - (void)OAuthClient:(RKOAuth2Client *)client didAcquireAccessToken:(NSString *)token {
-    
+    RKAlertWithTitle(@"Access Token Obtained", [NSString stringWithFormat:@"Obtained access token: %@", token]);
 }
 
 - (void)OAuthClient:(RKOAuth2Client *)client didFailWithInvalidGrantError:(NSError *)error {
@@ -227,7 +242,8 @@ enum {
 
 - (IBAction)showAuthenticationWebView:(id)sender {
     RKAuthenticationExampleOAuthDialog *dialog = [[RKAuthenticationExampleOAuthDialog alloc] initWithNibName:nil bundle:nil];
-    [self.navigationController presentModalViewController:dialog animated:YES];
+    [self.navigationController pushViewController:dialog animated:YES];
+//    [self presentModalViewController:dialog animated:YES];
 }
 
 @end

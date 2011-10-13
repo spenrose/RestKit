@@ -44,8 +44,9 @@ typedef enum RKOAuth2ClientErrors {
 	NSString *_clientID;
     NSString *_clientSecret;
 	NSString *_authorizationCode;
-    NSURL *_authorizationURL;
-    NSURL *_callbackURL;
+    NSURL *_authorizeURL;
+    NSURL *_redirectURL;
+    NSURL *_tokenURL;
     NSString *_accessToken;
     id<RKOAuth2ClientDelegate> _delegate;
 }
@@ -55,27 +56,30 @@ typedef enum RKOAuth2ClientErrors {
 /**
  The authorization code issued by the authorization server
  */
-@property(nonatomic, retain) NSString *authorizationCode;
+// TODO: becomes accessToken:...
+// Not sure that we need as property... just arg to authorize method
+@property(nonatomic, copy) NSString *authorizationCode;
 
 /**
  A unique string issued by the authorization server for uniquely 
  identifying the client
  */
-@property(nonatomic, retain) NSString *clientID;
+@property(nonatomic, copy) NSString *clientID;
 
 /**
  A secret access token for authenticating the client
  */
-@property(nonatomic, retain) NSString *clientSecret;
+@property(nonatomic, copy) NSString *clientSecret;
 
 /// @name OAuth Endpoints
 
-// The end-user URL endpoint for authorization???
-@property (nonatomic, retain) NSURL *authorizeURL;
-@property (nonatomic, retain) NSURL *tokenURL;
+// End user authorization endpoint
+@property (nonatomic, copy) NSURL *authorizeURL;
+// Token 
+@property (nonatomic, copy) NSURL *tokenURL;
 
 // Redirection URL (Web Server Flow)
-@property (nonatomic, retain) NSURL *redirectURL;
+@property (nonatomic, copy) NSURL *redirectURL;
 
 /**
  Returns the access token retrieved
@@ -97,7 +101,7 @@ typedef enum RKOAuth2ClientErrors {
               tokenURL:(NSURL *)tokenURL;
 
 // Actions
-- (void)validateAuthorizationCode;
+// - (void)validateAuthorizationCode;
 
 // Get NSURL for external login (Web Server Flow)
 // Get NSURLRequest for web login (Web Server Flow)
