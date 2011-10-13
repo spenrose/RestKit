@@ -49,10 +49,10 @@ RKClient* RKSpecNewClient(void) {
     return client;
 }
 
-RKOAuthClient* RKSpecNewOAuthClient(RKSpecResponseLoader* loader){
+RKOAuth2Client* RKSpecNewOAuth2Client(RKSpecResponseLoader* loader){
     [loader setTimeout:10];
-    RKOAuthClient* client = [RKOAuthClient clientWithClientID:@"appID" secret:@"appSecret" delegate:loader];
-    client.authorizationURL = [NSString stringWithFormat:@"%@/oauth/authorize",RKSpecGetBaseURL()];
+    RKOAuth2Client* client = [RKOAuth2Client clientWithClientID:@"appID" secret:@"appSecret" delegate:loader];
+    client.authorizationURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/oauth/authorize",RKSpecGetBaseURL()]];
     return client;
 }
 

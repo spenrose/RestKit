@@ -236,7 +236,7 @@
 
 - (void)itShouldDescribeElementMappings {
     RKObjectAttributeMapping* elementMapping = [RKObjectAttributeMapping mappingFromKeyPath:@"id" toKeyPath:@"userID"];
-    [expectThat([elementMapping description]) should:be(@"RKObjectKeyPathMapping: id => userID")];
+    [expectThat([elementMapping description]) should:be(@"RKObjectAttributeMapping: id => userID")];
 }
 
 #pragma mark - RKObjectMapping Specs

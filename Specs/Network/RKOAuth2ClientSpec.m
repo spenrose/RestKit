@@ -1,5 +1,5 @@
 //
-//  RKOAuthClientSpec.m
+//  RKOAuth2ClientSpec.m
 //  RestKit
 //
 //  Created by Rodrigo Garcia on 8/4/11.
@@ -20,15 +20,15 @@
 
 #import "RKSpecEnvironment.h"
 
-@interface RKOAuthClientSpec : RKSpec
+@interface RKOAuth2ClientSpec : RKSpec
 
 @end
 
-@implementation RKOAuthClientSpec
+@implementation RKOAuth2ClientSpec
 
 - (void)itShouldGetAccessToken{
     RKSpecResponseLoader *loader = [RKSpecResponseLoader responseLoader];
-    RKOAuthClient *client = RKSpecNewOAuthClient(loader);
+    RKOAuth2Client *client = RKSpecNewOAuth2Client(loader);
     client.authorizationCode = @"1234";
     client.callbackURL = @"http://someURL.com";
     [client validateAuthorizationCode];
@@ -38,7 +38,7 @@
 
 - (void)itShouldNotGetAccessToken{
     RKSpecResponseLoader *loader = [RKSpecResponseLoader responseLoader];
-    RKOAuthClient *client = RKSpecNewOAuthClient(loader);
+    RKOAuth2Client *client = RKSpecNewOAuth2Client(loader);
     client.authorizationCode = @"someInvalidAuthorizationCode";
     client.callbackURL = @"http://someURL.com";
     [client validateAuthorizationCode];
@@ -50,7 +50,7 @@
 - (void)itShouldGetProtectedResource{
     //TODO: Encapsulate this code in a correct manner
     RKSpecResponseLoader *loader = [RKSpecResponseLoader responseLoader];
-    RKOAuthClient *client = RKSpecNewOAuthClient(loader);
+    RKOAuth2Client *client = RKSpecNewOAuth2Client(loader);
     client.authorizationCode = @"1234";
     client.callbackURL = @"http://someURL.com";
     [client validateAuthorizationCode];

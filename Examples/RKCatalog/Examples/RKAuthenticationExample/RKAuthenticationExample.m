@@ -8,12 +8,70 @@
 
 #import "RKAuthenticationExample.h"
 
+enum {
+    RKAuthenticationExampleAuthNone = 0,
+    RKAuthenticationExampleHTTPAuthRow,
+    RKAuthenticationExampleHTTPAuthBasicRow,
+    RKAuthenticationExampleOAuth1,
+    RKAuthenticationExampleOAuth2
+};
+
+@interface RKAuthenticationExampleOAuthDialog : UIViewController <RKOAuth2ClientDelegate>
+
+@property (nonatomic, retain) UIWebView *webView;
+@property (nonatomic, retain) RKOAuth2Client *OAuthClient;
+@end
+
+@implementation RKAuthenticationExampleOAuthDialog
+
+@synthesize webView;
+@synthesize OAuthClient;
+
+- (void)loadView {
+    [super loadView];
+    
+    webView = [[UIWebView alloc] initWithFrame:self.view.bounds];
+    [self.view addSubview:webView];
+    [webView release];
+    
+    OAuthClient = [[RKOAuth2Client alloc] initWithClientID:@"230395497014065" 
+                                              clientSecret:@"1190baa4b907b1adc2c53e1d9cacbe9b" 
+                                              authorizeURL:[NSURL URLWithString:@"https://www.facebook.com/dialog/oauth"] 
+                                                  tokenURL:[NSURL URLWithString:@"https://graph.facebook.com/oauth/access_token"]];
+    OAuthClient.redirectURL = [NSURL URLWithString:@"https://www.facebook.com/connect/login_success.html"];
+    OAuthClient.delegate = self;
+    self.modalPresentationStyle = UIModalPresentationFormSheet;
+    
+    // Ask Facebook to draw mobile friendly
+    NSDictionary *params = [NSDictionary dictionaryWithObject:@"touch" forKey:@"display"];
+    [OAuthClient authorizeUsingWebView:webView additionalParameters:params];
+}
+
+#pragma mark - RKOAuth2Client
+
+- (void)OAuthClient:(RKOAuth2Client *)client didAcquireAccessToken:(NSString *)token {
+    
+}
+
+- (void)OAuthClient:(RKOAuth2Client *)client didFailWithInvalidGrantError:(NSError *)error {
+    
+}
+
+@end
+
 @implementation RKAuthenticationExample
 
+@synthesize pickerView;
 @synthesize URLTextField;
 @synthesize usernameTextField;
 @synthesize passwordTextField;
 @synthesize authenticationTypePickerView;
+@synthesize OAuthLabel;
+@synthesize consumerKeyOrAccessToken;
+@synthesize consumerSecretOrRefreshToken;
+@synthesize accessToken;
+@synthesize accessTokenSecret;
+@synthesize authenticateButton;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -21,8 +79,14 @@
     if (self) {
         RKClient *client = [RKClient clientWithBaseURL:gRKCatalogBaseURL];
         [RKClient setSharedClient:client];
+        self.title = @"Authentication";
     }
     return self;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [pickerView selectRow:1 inComponent:0 animated:YES];
 }
 
 /**
@@ -34,9 +98,20 @@
     NSURL *URL = [NSURL URLWithString:[URLTextField text]];
     RKRequest *request = [RKRequest requestWithURL:URL delegate:self];
     request.queue = [RKClient sharedClient].requestQueue;
-    request.authenticationType = RKRequestAuthenticationTypeHTTP;
-    request.username = [usernameTextField text];
-    request.password = [passwordTextField text];
+    request.authenticationType = [pickerView selectedRowInComponent:0];
+    
+    if (request.authenticationType == RKRequestAuthenticationTypeHTTP || request.authenticationType == RKRequestAuthenticationTypeHTTPBasic) {
+        request.username = [usernameTextField text];
+        request.password = [passwordTextField text];
+    } else if (request.authenticationType == RKRequestAuthenticationTypeOAuth1) {
+        request.OAuth1AccessToken = [accessToken text];
+        request.OAuth1AccessTokenSecret = [accessTokenSecret text];
+        request.OAuth1ConsumerKey = [consumerKeyOrAccessToken text];
+        request.OAuth1ConsumerSecret = [consumerSecretOrRefreshToken text];
+    } else if (request.authenticationType == RKRequestAuthenticationTypeOAuth2) {
+        request.OAuth2AccessToken = [consumerKeyOrAccessToken text];
+        request.OAuth2RefreshToken = [consumerSecretOrRefreshToken text];
+    }
     [request send];
 }
 
@@ -56,7 +131,103 @@
 
 // returns the # of rows in each component..
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
-    return 0;
+    return 5;
+}
+
+- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
+    switch (row) {
+        case RKAuthenticationExampleAuthNone:
+            return @"None";
+            break;
+            
+        case RKAuthenticationExampleHTTPAuthRow:
+            return @"HTTP Auth";
+            break;
+        
+        case RKAuthenticationExampleHTTPAuthBasicRow:
+            return @"HTTP Basic Auth";
+            break;
+        
+        case RKAuthenticationExampleOAuth1:
+            return @"OAuth 1.0";
+            break;
+        
+        case RKAuthenticationExampleOAuth2:
+            return @"OAuth 2.0";
+            break;
+            
+        default:
+            break;
+    }
+    
+    return nil;
+}
+
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
+    switch (row) {
+        case RKAuthenticationExampleAuthNone:
+            usernameTextField.hidden = YES;
+            passwordTextField.hidden = YES;
+            
+            OAuthLabel.hidden = YES;
+            consumerKeyOrAccessToken.hidden = YES;
+            consumerSecretOrRefreshToken.hidden = YES;
+            accessToken.hidden = YES;
+            accessTokenSecret.hidden = YES;
+            authenticateButton.hidden = YES;
+            break;
+            
+        case RKAuthenticationExampleHTTPAuthRow:
+        case RKAuthenticationExampleHTTPAuthBasicRow:
+            usernameTextField.hidden = NO;
+            passwordTextField.hidden = NO;
+            
+            OAuthLabel.hidden = YES;
+            consumerKeyOrAccessToken.hidden = YES;
+            consumerSecretOrRefreshToken.hidden = YES;
+            accessToken.hidden = YES;
+            accessTokenSecret.hidden = YES;
+            authenticateButton.hidden = YES;
+            break;
+        
+        case RKAuthenticationExampleOAuth1:
+            usernameTextField.hidden = YES;
+            passwordTextField.hidden = YES;
+            
+            OAuthLabel.hidden = NO;
+            consumerKeyOrAccessToken.hidden = NO;
+            consumerSecretOrRefreshToken.hidden = NO;
+            accessToken.hidden = NO;
+            accessTokenSecret.hidden = NO;
+            
+            consumerKeyOrAccessToken.placeholder = @"Consumer Key";
+            consumerSecretOrRefreshToken.placeholder = @"Consumer Secret";
+            authenticateButton.hidden = YES;
+            break;
+        
+        case RKAuthenticationExampleOAuth2:
+            usernameTextField.hidden = YES;
+            passwordTextField.hidden = YES;
+            
+            OAuthLabel.hidden = NO;
+            consumerKeyOrAccessToken.hidden = NO;
+            consumerSecretOrRefreshToken.hidden = NO;
+            accessToken.hidden = YES;
+            accessTokenSecret.hidden = YES;
+            
+            consumerKeyOrAccessToken.placeholder = @"Access Token";
+            consumerSecretOrRefreshToken.placeholder = @"Refresh Token";            
+            authenticateButton.hidden = NO;
+            break;
+            
+        default:
+            break;
+    }
+}
+
+- (IBAction)showAuthenticationWebView:(id)sender {
+    RKAuthenticationExampleOAuthDialog *dialog = [[RKAuthenticationExampleOAuthDialog alloc] initWithNibName:nil bundle:nil];
+    [self.navigationController presentModalViewController:dialog animated:YES];
 }
 
 @end

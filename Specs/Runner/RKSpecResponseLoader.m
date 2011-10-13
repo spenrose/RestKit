@@ -120,13 +120,13 @@
 
 #pragma mark - OAuth delegates
 
-- (void)OAuthClient:(RKOAuthClient *)client didAcquireAccessToken:(NSString *)token {
+- (void)OAuthClient:(RKOAuth2Client *)client didAcquireAccessToken:(NSString *)token {
     _awaitingResponse = NO;
     _success = YES;
 }
 
 
-- (void)OAuthClient:(RKOAuthClient *)client didFailWithInvalidGrantError:(NSError *)error {
+- (void)OAuthClient:(RKOAuth2Client *)client didFailWithInvalidGrantError:(NSError *)error {
     _awaitingResponse = NO;
     _success = NO;
 }

@@ -325,9 +325,9 @@
 		73C89EF312A5BB9A000FE600 /* RKReachabilityObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 73C89EF012A5BB9A000FE600 /* RKReachabilityObserver.m */; };
 		73FE56C7126CB91600E0F30B /* RKURL.h in Headers */ = {isa = PBXBuildFile; fileRef = 73FE56C4126CB91600E0F30B /* RKURL.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		73FE56C8126CB91600E0F30B /* RKURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 73FE56C5126CB91600E0F30B /* RKURL.m */; };
-		AF26F36A13EB40A9007F4868 /* RKOAuthClientSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = AF26F36913EB40A9007F4868 /* RKOAuthClientSpec.m */; };
-		AFD8CC8D13D8E61200E63E62 /* RKOAuthClient.h in Headers */ = {isa = PBXBuildFile; fileRef = AFD8CC8B13D8E61200E63E62 /* RKOAuthClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		AFD8CC8E13D8E61200E63E62 /* RKOAuthClient.m in Sources */ = {isa = PBXBuildFile; fileRef = AFD8CC8C13D8E61200E63E62 /* RKOAuthClient.m */; };
+		AF26F36A13EB40A9007F4868 /* RKOAuth2ClientSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = AF26F36913EB40A9007F4868 /* RKOAuth2ClientSpec.m */; };
+		AFD8CC8D13D8E61200E63E62 /* RKOAuth2Client.h in Headers */ = {isa = PBXBuildFile; fileRef = AFD8CC8B13D8E61200E63E62 /* RKOAuth2Client.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AFD8CC8E13D8E61200E63E62 /* RKOAuth2Client.m in Sources */ = {isa = PBXBuildFile; fileRef = AFD8CC8C13D8E61200E63E62 /* RKOAuth2Client.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -779,9 +779,9 @@
 		73FE56C4126CB91600E0F30B /* RKURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKURL.h; sourceTree = "<group>"; };
 		73FE56C5126CB91600E0F30B /* RKURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKURL.m; sourceTree = "<group>"; };
 		AACBBE490F95108600F1A2B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		AF26F36913EB40A9007F4868 /* RKOAuthClientSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKOAuthClientSpec.m; sourceTree = "<group>"; };
-		AFD8CC8B13D8E61200E63E62 /* RKOAuthClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKOAuthClient.h; sourceTree = "<group>"; };
-		AFD8CC8C13D8E61200E63E62 /* RKOAuthClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKOAuthClient.m; sourceTree = "<group>"; };
+		AF26F36913EB40A9007F4868 /* RKOAuth2ClientSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKOAuth2ClientSpec.m; sourceTree = "<group>"; };
+		AFD8CC8B13D8E61200E63E62 /* RKOAuth2Client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKOAuth2Client.h; sourceTree = "<group>"; };
+		AFD8CC8C13D8E61200E63E62 /* RKOAuth2Client.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKOAuth2Client.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1101,8 +1101,8 @@
 				25A1CB3B1383F7DF00A7D5C9 /* RKRequestSerialization.h */,
 				25A1CB3C1383F7E100A7D5C9 /* RKRequestSerialization.m */,
 				257FB7051395DABB003A628E /* RKRequest_Internals.h */,
-				AFD8CC8B13D8E61200E63E62 /* RKOAuthClient.h */,
-				AFD8CC8C13D8E61200E63E62 /* RKOAuthClient.m */,
+				AFD8CC8B13D8E61200E63E62 /* RKOAuth2Client.h */,
+				AFD8CC8C13D8E61200E63E62 /* RKOAuth2Client.m */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -1500,7 +1500,7 @@
 				250C296B13411E60000A3551 /* RKRequestQueueSpec.m */,
 				25ACF1AC13BB9D480067B380 /* RKURLSpec.m */,
 				2559208213BD1A4000E9C29C /* RKParamsSpec.m */,
-				AF26F36913EB40A9007F4868 /* RKOAuthClientSpec.m */,
+				AF26F36913EB40A9007F4868 /* RKOAuth2ClientSpec.m */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -1677,7 +1677,7 @@
 				253A08E0125522E300976E89 /* RKResponse.h in Headers */,
 				73C89EF212A5BB9A000FE600 /* RKReachabilityObserver.h in Headers */,
 				2538C05C12A6C44A0006903C /* RKRequestQueue.h in Headers */,
-				AFD8CC8D13D8E61200E63E62 /* RKOAuthClient.h in Headers */,
+				AFD8CC8D13D8E61200E63E62 /* RKOAuth2Client.h in Headers */,
 				3F278A44139D2AFF009AC3FA /* RKRequestCache.h in Headers */,
 				25A1CB3F138404CF00A7D5C9 /* RKRequestSerialization.h in Headers */,
 				73FE56C7126CB91600E0F30B /* RKURL.h in Headers */,
@@ -2221,7 +2221,7 @@
 				3F278A41139D2AFF009AC3FA /* NSData+MD5.m in Sources */,
 				3F278A43139D2AFF009AC3FA /* NSString+MD5.m in Sources */,
 				3F278A45139D2AFF009AC3FA /* RKRequestCache.m in Sources */,
-				AFD8CC8E13D8E61200E63E62 /* RKOAuthClient.m in Sources */,
+				AFD8CC8E13D8E61200E63E62 /* RKOAuth2Client.m in Sources */,
 				25ACA5B31429054D0037FE98 /* TDOAuth.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2382,7 +2382,7 @@
 				37DEBA651411298300FDF847 /* NSStringRestKitSpec.m in Sources */,
 				3703ABB0141941FB00DB697A /* RKDotNetDateFormatterSpec.m in Sources */,
 				37959B201426D4E500F9A8C6 /* RKObjectMappingProviderSpec.m in Sources */,
-				AF26F36A13EB40A9007F4868 /* RKOAuthClientSpec.m in Sources */,
+				AF26F36A13EB40A9007F4868 /* RKOAuth2ClientSpec.m in Sources */,
 				25ACA5A11428FC260037FE98 /* RKObjectiveCPlusPlusSpec.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -26,4 +26,4 @@
 #import "RKReachabilityObserver.h"
 #import "RKRequestQueue.h"
 #import "RKNotifications.h"
-#import "RKOAuthClient.h"
+#import "RKOAuth2Client.h"

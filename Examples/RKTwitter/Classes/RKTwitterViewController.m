@@ -6,6 +6,7 @@
 //  Copyright Two Toasters 2010. All rights reserved.
 //
 
+#import <RestKit/Network/RKOAuth2Client.h>
 #import "RKTwitterViewController.h"
 #import "RKTStatus.h"
 
@@ -35,7 +36,13 @@
 	self.title = @"RestKit Tweets";
     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleBlackTranslucent;
     self.navigationController.navigationBar.tintColor = [UIColor blackColor];
-	self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(loadTimeline)] autorelease];
+    self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"Login" 
+                                                                              style:UIBarButtonItemStylePlain 
+                                                                             target:self 
+                                                                             action:@selector(loginViaOAuth2:)] autorelease];
+	self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
+                                                                                            target:self 
+                                                                                            action:@selector(loadTimeline)] autorelease];
     
 	UIImageView* imageView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"BG.png"]] autorelease];
 	imageView.frame = CGRectOffset(imageView.frame, 0, -64);
@@ -102,6 +109,10 @@
 	}
 	cell.textLabel.text = [[_statuses objectAtIndex:indexPath.row] text];
 	return cell;
+}
+
+- (void)loginViaOAuth2:(id)sender {
+    //
 }
 
 @end
