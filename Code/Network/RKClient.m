@@ -211,7 +211,8 @@ NSString * RKPathAppendQueryParams(NSString *resourcePath, NSDictionary *queryPa
 	request.password = self.password;
 	request.cachePolicy = self.cachePolicy;
     request.cache = self.requestCache;
-    request.queue = self.requestQueue; 
+    request.queue = self.requestQueue;
+    request.reachabilityObserver = self.baseURLReachabilityObserver;
     
     // OAuth 1 Parameters
     request.OAuth1AccessToken = self.OAuth1AccessToken;
