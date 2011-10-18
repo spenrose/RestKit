@@ -250,13 +250,14 @@ NSString * RKPathAppendQueryParams(NSString *resourcePath, NSDictionary *queryPa
         
         // Configure a new reachability observer
         NSURL *URL = [NSURL URLWithString:newBaseURL];
-        _baseURLReachabilityObserver = [[RKReachabilityObserver alloc] initWithHostname:[URL host]];
+        // _baseURLReachabilityObserver = [[RKReachabilityObserver alloc] initWithHostname:[URL host]];
+        _baseURLReachabilityObserver = [[RKReachabilityObserver reachabilityObserverForInternet] retain];
         
         // Suspend the queue until reachability to our new hostname is established
-        self.requestQueue.suspended = !_baseURLReachabilityObserver.reachabilityEstablished;
+        self.requestQueue.suspended = !_baseURLReachabilityObserver.reachabilityDetermined;
         [[NSNotificationCenter defaultCenter] addObserver:self 
                                                  selector:@selector(reachabilityWasDetermined:) 
-                                                     name:RKReachabilityStateWasDeterminedNotification 
+                                                     name:RKReachabilityWasDeterminedNotification 
                                                    object:_baseURLReachabilityObserver];
         RKLogDebug(@"Base URL changed for client %@, suspending queue %@ until reachability to host '%@' can be determined", 
                    self, self.requestQueue, [URL host]);
@@ -278,7 +279,7 @@ NSString * RKPathAppendQueryParams(NSString *resourcePath, NSDictionary *queryPa
     if (! [newQueue isEqual:[NSNull null]]) {
         // The request queue has changed while we were awaiting reachability. 
         // Suspend the queue until reachability is determined
-        newQueue.suspended = !_baseURLReachabilityObserver.reachabilityEstablished;
+        newQueue.suspended = !_baseURLReachabilityObserver.reachabilityDetermined;
     }
 }
 
@@ -352,10 +353,10 @@ NSString * RKPathAppendQueryParams(NSString *resourcePath, NSDictionary *queryPa
     RKReachabilityObserver *observer = (RKReachabilityObserver *) [notification object];
     NSAssert(observer == _baseURLReachabilityObserver, @"Received unexpected reachability notification from inappropriate reachability observer");
     
-    RKLogDebug(@"Reachability to host '%@' determined for client %@, unsuspending queue %@", observer.hostName, self, self.requestQueue);
+    RKLogDebug(@"Reachability to host '%@' determined for client %@, unsuspending queue %@", observer.host, self, self.requestQueue);
     _awaitingReachabilityDetermination = NO;
     self.requestQueue.suspended = NO;
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:RKReachabilityStateWasDeterminedNotification object:observer];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:RKReachabilityWasDeterminedNotification object:observer];
 }
 
 // deprecated

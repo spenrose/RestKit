@@ -64,7 +64,7 @@ static RKObjectManager* sharedManager = nil;
         		
 		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(reachabilityChanged:)
-													 name:RKReachabilityStateChangedNotification
+													 name:RKReachabilityDidChangeNotification
 												   object:_client.baseURLReachabilityObserver];
 	}
     
