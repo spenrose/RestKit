@@ -367,7 +367,10 @@
 }
 
 - (BOOL)shouldDispatchRequest {
-    return [RKClient sharedClient] == nil || [[RKClient sharedClient] isNetworkAvailable];
+    // Temporarily return YES always for request dispatching. Should be replaced with request ivar reference to reachability observer
+    return YES;
+//    return [RKClient sharedClient] == nil || [[RKClient sharedClient] isNetworkAvailable];
+//    return [RKClient sharedClient]
 }
 
 - (void)sendAsynchronously {
@@ -447,11 +450,11 @@
         _isLoading = YES;
         [self didFinishLoad:response];
     } else if ([self shouldDispatchRequest]) {
-      RKLogDebug(@"Sending synchronous %@ request to URL %@.", [self HTTPMethod], [[self URL] absoluteString]);
-		  if (![self prepareURLRequest]) {
-      // TODO: Logging
-        return nil;
-      }
+        RKLogDebug(@"Sending synchronous %@ request to URL %@.", [self HTTPMethod], [[self URL] absoluteString]);
+        if (![self prepareURLRequest]) {
+            // TODO: Logging
+            return nil;
+        }
 
 		[[NSNotificationCenter defaultCenter] postNotificationName:RKRequestSentNotification object:self userInfo:nil];
 
