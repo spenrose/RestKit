@@ -65,7 +65,7 @@ static RKObjectManager* sharedManager = nil;
 		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(reachabilityChanged:)
 													 name:RKReachabilityDidChangeNotification
-												   object:_client.baseURLReachabilityObserver];
+												   object:_client.reachabilityObserver];
 	}
     
 	return self;
@@ -115,7 +115,7 @@ static RKObjectManager* sharedManager = nil;
 }
 
 - (void)reachabilityChanged:(NSNotification*)notification {
-	BOOL isHostReachable = [self.client.baseURLReachabilityObserver isNetworkReachable];
+	BOOL isHostReachable = [self.client.reachabilityObserver isNetworkReachable];
 
 	_onlineState = isHostReachable ? RKObjectManagerOnlineStateConnected : RKObjectManagerOnlineStateDisconnected;
 
