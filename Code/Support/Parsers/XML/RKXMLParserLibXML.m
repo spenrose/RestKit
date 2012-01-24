@@ -37,6 +37,8 @@
                     // Assume that empty strings are irrelevant and go for an attribute-collection instead
                     if ([val length] == 0) {
                         val = [NSMutableDictionary dictionary];
+                        attrs = [NSMutableDictionary dictionary];
+                        oldVal = [attrs valueForKey:nodeName];
                         NSMutableDictionary* elem = [NSMutableDictionary dictionaryWithObject:val forKey:nodeName];
                         [nodes addObject:elem];
                     } else {
@@ -50,7 +52,7 @@
                 }
                 
                 // Only add attributes to nodes if there actually is one.
-                if (![nodes containsObject:attrs]) {
+                if (![nodes containsObject:attrs] && [attrs count] > 0) {
                     [nodes addObject:attrs];
                 }
             } else {
@@ -67,6 +69,24 @@
                 [attrs setValue:value forKey:name];
                 if ([val isKindOfClass:[NSDictionary class]]) {
                     // Add attributes as properties of the class
+                    [val setObject:value forKey:name];
+                } else if ([val isKindOfClass:[NSString class]]) {
+                    // We have a string that also has attributes. Convert the string into a 
+                    // dictionary and add the string to the dictionary as node name
+                    NSString* tempVal = val;
+                    [attrs removeObjectForKey:nodeName];
+                    [attrs removeObjectForKey:name];
+                    
+                    // Node before this only contained a string so add it
+                    if (![nodes containsObject:attrs] && [attrs count] > 0) {
+                        [nodes addObject:attrs];
+                    }
+                    
+                    val = [NSMutableDictionary dictionary];
+                    attrs = [NSMutableDictionary dictionary];
+                    NSMutableDictionary* elem = [NSMutableDictionary dictionaryWithObject:val forKey:nodeName];
+                    [nodes addObject:elem];
+                    [val setObject:tempVal forKey:nodeName];
                     [val setObject:value forKey:name];
                 } else if (![nodes containsObject:attrs]) {
                     // Only add attributes to nodes if there actually is one.
